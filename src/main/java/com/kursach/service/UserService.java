@@ -1,9 +1,11 @@
 package com.kursach.service;
 
+import com.kursach.entity.Device;
 import com.kursach.entity.Role;
 import com.kursach.entity.User;
 import com.kursach.repository.RoleRepository;
 import com.kursach.repository.UserRepository;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -39,7 +41,14 @@ public class UserService implements UserDetailsService {
 
         return user;
     }
+    public void addDeviceToDeviceList(Device device, Long userId) throws NotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found with id " + userId));
 
+        user.getDevices().add(device);
+
+        userRepository.save(user);
+    }
     public User findUserById(Long userId) {
         Optional<User> userFromDb = userRepository.findById(userId);
         return userFromDb.orElse(new User());
@@ -69,5 +78,7 @@ public class UserService implements UserDetailsService {
         }
         return false;
     }
+
+
 
 }

@@ -18,10 +18,22 @@ public class User implements UserDetails {
     private String password;
     @Transient
     private String passwordConfirm;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Device> devices;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
     public User() {
+    }
+
+    public Set<Device> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(Set<Device> devices) {
+        this.devices = devices;
     }
 
     public Long getId() {

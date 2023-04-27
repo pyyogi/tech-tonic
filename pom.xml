@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example.springboot</groupId>
-	<artifactId>jwt-authorization</artifactId>
+	<artifactId>tech-tonic-back</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>jwt</name>
 	<description>Stateless JWT authentication with Spring Boot</description>
@@ -63,7 +63,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-    </dependencies>
+		<!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>8.0.0.Final</version>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<plugins>

@@ -37,7 +37,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .antMatchers(
                                         "/error",
                                         "/login",
-                                        "/signup"
+                                        "/signup",
+                                        "/main"
                                 )
                                 .permitAll()
                                 .anyRequest()
