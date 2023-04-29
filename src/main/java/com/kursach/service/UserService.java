@@ -7,6 +7,7 @@ import com.kursach.repository.RoleRepository;
 import com.kursach.repository.UserRepository;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +19,7 @@ import javax.persistence.PersistenceContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -41,12 +43,9 @@ public class UserService implements UserDetailsService {
 
         return user;
     }
-    public void addDeviceToDeviceList(Device device, Long userId) throws NotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found with id " + userId));
-
+    public void addDeviceToDeviceList(Device device, String username) throws NotFoundException {
+        User user = userRepository.findByUsername(username);
         user.getDevices().add(device);
-
         userRepository.save(user);
     }
     public User findUserById(Long userId) {
@@ -79,6 +78,43 @@ public class UserService implements UserDetailsService {
         return false;
     }
 
+    public Set<Device> getDeviceSetFromUser(String username){
+        User user = userRepository.findByUsername(username);
+        return user.getDevices();
+    }
+    public void addDeviceToUser(String username, Device device) throws NotFoundException {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+
+        Set<Device> devices = user.getDevices();
+        devices.add(device);
+
+        user.setDevices(devices);
+        userRepository.save(user);
+    }
+
+    public HttpStatus deleteDeviceFromDeviceList(Device device, Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return HttpStatus.NOT_FOUND;
+        }
+
+        Set<Device> devices = user.getDevices();
+        if (devices == null || devices.isEmpty()) {
+            return HttpStatus.OK;
+        }
+
+        if (!devices.contains(device)) {
+            return HttpStatus.OK;
+        }
+
+        devices.remove(device);
+        userRepository.save(user);
+
+        return HttpStatus.OK;
+    }
 
 
 }

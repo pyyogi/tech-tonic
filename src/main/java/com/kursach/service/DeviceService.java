@@ -1,30 +1,42 @@
 package com.kursach.service;
 
-import com.kursach.entity.Cargo;
 import com.kursach.entity.Device;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.kursach.repository.DeviceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface DeviceService {
-    List<Device> findAll();
+@Service
+public class DeviceService {
+    @Autowired
+    private DeviceRepository deviceRepository;
 
-    Page<Device> findAll(Pageable pageable);
+    public List<Device> getAll() {
+        return deviceRepository.findAll();
+    }
 
-    Page<Device> findByPriceBetween(Integer startPrice, Integer endPrice, Pageable pageable);
+    public Device getById(Long id) {
+        return deviceRepository.findById(id).orElse(null);
+    }
 
-    Page<Device> findByTitle(String title, Pageable pageable);
+    public HttpStatus save(Device device) {
+        try {
+            deviceRepository.save(device);
+            return HttpStatus.OK;
+        } catch (Exception e) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
 
-    Page<Device> findByType(String type, Pageable pageable);
-
-    Page<Device> findByBrand(String brand, Pageable pageable);
-
-    public HttpStatus Save(Device device);
-
-    public HttpStatus Delete(Long deviceId);
-
+    public HttpStatus delete(Long id) {
+        try {
+            deviceRepository.deleteById(id);
+            return HttpStatus.OK;
+        } catch (Exception e) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
 }

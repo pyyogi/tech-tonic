@@ -1,14 +1,16 @@
 package com.kursach.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 
 @Entity
@@ -17,23 +19,30 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "device")
+@ToString
 public class Device {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty(message = "Пожалуйста заполните поле")
-    @Length(max = 255)
+    @NotEmpty(message = "Please fill in this field.")
+    @Length(max = 255, message = "The maximum length for this field is 255 characters.")
     private String title;
-    @NotBlank(message = "Пожалуйста заполните поле")
+
+    @NotBlank(message = "Please fill in this field.")
     private int price;
-    @NotBlank(message = "Пожалуйста заполните поле")
-    @Length(min=20, message = "Слишком короткое описание")
+
+    @NotBlank(message = "Please fill in this field.")
+    @Length(min = 20, message = "The minimum length for this field is 20 characters.")
     private String description;
-    @NotBlank(message = "Пожалуйста заполните поле")
+
+    @NotBlank(message = "Please fill in this field.")
     private String type;
-    @NotBlank(message = "Пожалуйста заполните поле")
+
+    @NotBlank(message = "Please fill in this field.")
     private String brand;
-    @NotBlank(message = "Пожалуйста заполните поле")
+
+    @NotBlank(message = "Please fill in this field.")
     private String filename;
+
 }

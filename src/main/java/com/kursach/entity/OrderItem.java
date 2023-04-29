@@ -2,36 +2,31 @@ package com.kursach.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.Objects;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import java.math.BigDecimal;
 
 @Entity
 @Getter
 @Setter
-@ToString
 @Table(name = "order_item")
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int quantity;
-
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "device_id")
     private Device device;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        OrderItem orderItem = (OrderItem) obj;
-        return Objects.equals(id, orderItem.id);
-    }
+    @NotNull(message = "Please enter a quantity")
+    @PositiveOrZero(message = "Quantity must be positive")
+    private int quantity;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
 }

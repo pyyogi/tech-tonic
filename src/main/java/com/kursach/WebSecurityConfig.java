@@ -1,5 +1,6 @@
 package com.kursach;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -40,6 +41,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                         "/signup",
                                         "/main"
                                 )
+                                .permitAll()
+                                .antMatchers("/api/users/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
