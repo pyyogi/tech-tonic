@@ -1,6 +1,8 @@
 package com.kursach.repository;
 
+import com.kursach.entity.Device;
 import com.kursach.entity.Order;
+import com.kursach.entity.OrderItem;
 import com.kursach.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,4 +14,5 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUser(User user);
+
 }

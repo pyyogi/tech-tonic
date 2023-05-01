@@ -29,4 +29,14 @@ public class OrderItem {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    public OrderItem(Device device, int quantity, Order order){
+        this.device = device;
+        this.quantity = quantity;
+        this.order = order;
+    }
+
+    public OrderItem(){
+
+    }
+
 }

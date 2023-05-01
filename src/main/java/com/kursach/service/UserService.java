@@ -95,8 +95,8 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public HttpStatus deleteDeviceFromDeviceList(Device device, Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+    public HttpStatus deleteDeviceFromDeviceList(Device device, String username) {
+        User user = userRepository.findByUsername(username);
         if (user == null) {
             return HttpStatus.NOT_FOUND;
         }

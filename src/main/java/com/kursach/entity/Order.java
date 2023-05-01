@@ -30,6 +30,7 @@ public class Order {
     @Column(name = "sum_price")
     private int sumPrice;
 
+
     public Order(User user) {
         this.user = user;
         this.orderItems = new ArrayList<>();

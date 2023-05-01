@@ -1,10 +1,14 @@
 package com.kursach.service;
 
+import com.kursach.dto.ItemQuantityDto;
 import com.kursach.entity.Device;
 import com.kursach.entity.Order;
 import com.kursach.entity.OrderItem;
 import com.kursach.entity.User;
+import com.kursach.repository.DeviceRepository;
+import com.kursach.repository.OrderItemRepository;
 import com.kursach.repository.OrderRepository;
+import com.kursach.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,15 @@ public class OrderService {
 
     @Autowired
     private DeviceService deviceService;
+
+    @Autowired
+    private DeviceRepository deviceRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Transactional
     public HttpStatus createOrderFromUserDevices(String username) {
@@ -54,6 +67,7 @@ public class OrderService {
         }
         order.setOrderItems(orderItems);
         order.setSumPrice(sumPrice);
+//        order.setStatus("IN PROCESS");
         orderRepository.save(order);
 
         user.setDevices(new HashSet<>());
@@ -87,6 +101,62 @@ public class OrderService {
         orderRepository.save(order);
         return HttpStatus.OK;
     }
+
+    @Transactional
+    public HttpStatus confirmOrder(Long orderId){
+        Order order = orderRepository.getById(orderId);
+        if (order == null){
+            return HttpStatus.NOT_FOUND;
+        }
+//        order.setStatus("ORDERED");
+        return HttpStatus.OK;
+    }
+
+
+    @Transactional
+    public void createOrder(User user, List<ItemQuantityDto> items) {
+        // Create the order
+        Order order = new Order();
+        order.setUser(user);
+        order.setOrderItems(new ArrayList<>());
+        orderRepository.save(order);
+        // Iterate through the device quantities and create order items for each one
+        for (ItemQuantityDto item:
+            items) {
+
+                Device device = deviceService.getById(item.getDeviceId());
+                if ( device != null) {
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setDevice(device);
+                    orderItem.setQuantity(item.getQuantity());
+                    orderItem.setOrder(order);
+                    orderItemRepository.save(orderItem);
+                    order.getOrderItems().add(orderItem);
+                }
+
+        }
+
+        // Calculate the sum price
+        int sumPrice = calculateSumPrice(order);
+        order.setSumPrice(sumPrice);
+
+        // Save the order
+        orderRepository.save(order);
+
+        // Clear the user's cart
+        user.getDevices().clear();
+        userRepository.save(user);
+
+    }
+    public int calculateSumPrice(Order order) {
+        int sum = 0;
+        List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrder(order);
+        for (OrderItem orderItem : orderItems) {
+            sum += orderItem.getQuantity() * orderItem.getDevice().getPrice();
+        }
+        return sum;
+    }
+
 }
 
 
