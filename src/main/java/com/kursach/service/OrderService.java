@@ -137,7 +137,7 @@ public class OrderService {
         }
 
         // Calculate the sum price
-        int sumPrice = calculateSumPrice(order);
+        int sumPrice = calculateSumPrice(order.getId());
         order.setSumPrice(sumPrice);
 
         // Save the order
@@ -148,14 +148,15 @@ public class OrderService {
         userRepository.save(user);
 
     }
-    public int calculateSumPrice(Order order) {
+    public int calculateSumPrice(Long orderId) {
         int sum = 0;
-        List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrder(order);
+        List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrder(orderRepository.getById(orderId));
         for (OrderItem orderItem : orderItems) {
             sum += orderItem.getQuantity() * orderItem.getDevice().getPrice();
         }
         return sum;
     }
+
 
 }
 

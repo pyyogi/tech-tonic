@@ -1,5 +1,6 @@
 package com.kursach.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,6 +28,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnoreProperties("orderItems")
     private Order order;
 
     public OrderItem(Device device, int quantity, Order order){
