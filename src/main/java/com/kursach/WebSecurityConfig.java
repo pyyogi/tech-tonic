@@ -38,13 +38,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .antMatchers(
                                         "/error",
                                         "/login",
-                                        "/signup",
-                                        "/main"
+                                        "/signup"
                                 )
                                 .permitAll()
-                                .antMatchers("/api/users/**")
-                                .permitAll()
-                                .antMatchers("/api/orders/**")
+                                .antMatchers(HttpMethod.GET,
+                                        "/api/devices",
+                                        "/api/devices/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

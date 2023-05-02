@@ -1,9 +1,11 @@
 package com.kursach.entity;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Set;
 
@@ -14,8 +16,14 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
     private Long id;
+    @NotBlank
+    @Length(min = 5, max = 20, message = "Length needs to be between 5 and 20")
     private String username;
+    @NotBlank
+    @Length(min = 5, max = 20, message = "Length needs to be between 5 and 20")
     private String password;
+    @NotBlank
+    @Length(min = 5, max = 20, message = "Length needs to be between 5 and 20")
     @Transient
     private String passwordConfirm;
 

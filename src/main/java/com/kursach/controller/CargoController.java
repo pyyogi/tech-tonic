@@ -36,7 +36,7 @@ public class CargoController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('USER')")
+//    @PreAuthorize("hasAuthority('USER')")
     public List<Cargo> GetAll(){
         return this.cargo.findAll();
     }
