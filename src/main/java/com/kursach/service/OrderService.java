@@ -11,10 +11,12 @@ import com.kursach.repository.OrderRepository;
 import com.kursach.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.*;
 
 @Service
@@ -24,13 +26,7 @@ public class OrderService {
     private OrderRepository orderRepository;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private DeviceService deviceService;
-
-    @Autowired
-    private DeviceRepository deviceRepository;
 
     @Autowired
     private OrderItemRepository orderItemRepository;
@@ -39,100 +35,51 @@ public class OrderService {
     private UserRepository userRepository;
 
     @Transactional
-    public HttpStatus createOrderFromUserDevices(String username) {
-        User user = (User) userService.loadUserByUsername(username);
-        if (user == null) {
-            return HttpStatus.NOT_FOUND;
+    public ResponseEntity<Optional<Order>> getOrderById(Long orderId, Principal principal) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent() && order.get().getUser().getUsername().equals(principal.getName())) {
+            return new ResponseEntity<>(order, HttpStatus.OK);
         }
-        Set<Device> devices = user.getDevices();
-        if (devices == null || devices.isEmpty()) {
-            return HttpStatus.BAD_REQUEST;
-        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Order order = new Order();
-        order.setUser(user);
-        orderRepository.save(order);
-
-        List<OrderItem> orderItems = new ArrayList<>();
-
-        int sumPrice = 0;
-
-        for (Device device : devices) {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setDevice(device);
-            orderItem.setQuantity(1);
-            orderItem.setOrder(order);
-            orderItems.add(orderItem);
-            sumPrice += device.getPrice();
-        }
-        order.setOrderItems(orderItems);
-        order.setSumPrice(sumPrice);
-//        order.setStatus("IN PROCESS");
-        orderRepository.save(order);
-
-        user.setDevices(new HashSet<>());
-        userService.saveUser(user);
-
-        return HttpStatus.OK;
     }
 
     @Transactional
-    public HttpStatus changeOrderItemQuantity(Long orderId, Long orderItemId, int quantity) {
-        Order order = orderRepository.findById(orderId).orElse(null);
-        if (order == null) {
-            return HttpStatus.NOT_FOUND;
+    public ResponseEntity<Optional<List<Order>>> getOrders(String username, Principal principal) {
+        User user = userRepository.findByUsername(username);
+        Optional<List<Order>> orders = orderRepository.findByUser(user);
+        if (username.equals(principal.getName())) {
+            return new ResponseEntity<>(orders, HttpStatus.OK);
         }
-        List<OrderItem> orderItems = order.getOrderItems();
-        if (orderItems == null || orderItems.isEmpty()) {
-            return HttpStatus.BAD_REQUEST;
-        }
-        OrderItem orderItem = orderItems.stream()
-                .filter(item -> item.getId().equals(orderItemId))
-                .findFirst()
-                .orElse(null);
-        if (orderItem == null) {
-            return HttpStatus.NOT_FOUND;
-        }
-        if (quantity < 1) {
-            return HttpStatus.BAD_REQUEST;
-        }
-        order.setSumPrice(order.getSumPrice()+(orderItem.getQuantity()-quantity)*orderItem.getDevice().getPrice());
-        orderItem.setQuantity(quantity);
-        orderRepository.save(order);
-        return HttpStatus.OK;
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
 
     @Transactional
-    public HttpStatus confirmOrder(Long orderId){
-        Order order = orderRepository.getById(orderId);
-        if (order == null){
-            return HttpStatus.NOT_FOUND;
+    public HttpStatus createOrder(String username, List<ItemQuantityDto> items, Principal principal) {
+        // Find the user by username
+        User user = userRepository.findByUsername(username);
+        if (user == null || !principal.getName().equals(username)) {
+            return HttpStatus.BAD_REQUEST;
         }
-//        order.setStatus("ORDERED");
-        return HttpStatus.OK;
-    }
-
-
-    @Transactional
-    public void createOrder(User user, List<ItemQuantityDto> items) {
         // Create the order
         Order order = new Order();
         order.setUser(user);
         order.setOrderItems(new ArrayList<>());
         orderRepository.save(order);
         // Iterate through the device quantities and create order items for each one
-        for (ItemQuantityDto item:
-            items) {
+        for (ItemQuantityDto item :
+                items) {
 
-                Device device = deviceService.getById(item.getDeviceId());
-                if ( device != null) {
-                    OrderItem orderItem = new OrderItem();
-                    orderItem.setDevice(device);
-                    orderItem.setQuantity(item.getQuantity());
-                    orderItem.setOrder(order);
-                    orderItemRepository.save(orderItem);
-                    order.getOrderItems().add(orderItem);
-                }
+            Device device = deviceService.getById(item.getDeviceId());
+            if (device != null) {
+                OrderItem orderItem = new OrderItem();
+                orderItem.setDevice(device);
+                orderItem.setQuantity(item.getQuantity());
+                orderItem.setOrder(order);
+                orderItemRepository.save(orderItem);
+                order.getOrderItems().add(orderItem);
+            }
 
         }
 
@@ -146,8 +93,11 @@ public class OrderService {
         // Clear the user's cart
         user.getDevices().clear();
         userRepository.save(user);
+        return HttpStatus.OK;
+
 
     }
+
     public int calculateSumPrice(Long orderId) {
         int sum = 0;
         List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrder(orderRepository.getById(orderId));
@@ -159,21 +109,6 @@ public class OrderService {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //@Service

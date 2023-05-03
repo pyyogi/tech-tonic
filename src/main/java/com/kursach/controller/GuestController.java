@@ -1,33 +1,43 @@
-//package com.kursach.controller;
-//
-//import com.kursach.entity.Device;
-//import com.kursach.repository.DeviceRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//
-//import java.util.List;
-//import java.util.Optional;
-//
-//@Controller
-//
-//public class GuestController {
-//    private final DeviceServiceImplementation deviceService;
-//
-//    @Autowired
-//    private DeviceRepository deviceRepository;
-//    public GuestController(DeviceServiceImplementation deviceService){
-//        this.deviceService = deviceService;
-//    }
-//
-//    @GetMapping("/devices")
-//    public List<Device> getAll(){
-//        return this.deviceService.findAll();
-//    }
-//
-//    @GetMapping(path = "/devices/{id}")
-//    public Optional<Device> getById(@PathVariable("id") Long id){
-//        return this.deviceRepository.findById(id);
-//    }
-//}
+package com.kursach.controller;
+
+import com.kursach.entity.Device;
+import com.kursach.repository.DeviceRepository;
+import com.kursach.service.DeviceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
+import java.util.Optional;
+
+@Controller
+public class GuestController {
+    @Autowired
+    private DeviceService deviceService;
+
+    @Autowired
+    private DeviceRepository deviceRepository;
+
+    // Get all devices
+    @GetMapping(path="/devices")
+    public ResponseEntity<List<Device>> getAllDevices() {
+        List<Device> devices = deviceService.getAll();
+        if (devices == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(devices, HttpStatus.OK);
+    }
+
+    // Get device by id
+    @GetMapping("/devices/{id}")
+    public ResponseEntity<Device> getDeviceById(@PathVariable Long id) {
+        Device device = deviceService.getById(id);
+        if (device == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(device, HttpStatus.OK);
+    }
+}

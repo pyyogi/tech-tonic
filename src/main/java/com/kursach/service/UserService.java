@@ -8,6 +8,7 @@ import com.kursach.repository.UserRepository;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,10 +45,24 @@ public class UserService implements UserDetailsService {
 
         return user;
     }
-    public void addDeviceToDeviceList(Device device, String username) throws NotFoundException {
+    public HttpStatus addDeviceToUser(String username,
+                                      Device device,
+                                      Principal principal) {
         User user = userRepository.findByUsername(username);
-        user.getDevices().add(device);
-        userRepository.save(user);
+        System.out.println(user);
+        if (user == null || !user.getUsername().equals(principal.getName())){
+            return HttpStatus.NOT_FOUND;
+        }
+
+        try {
+            user.getDevices().add(device);
+            userRepository.save(user);
+        }catch (Exception e){
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return HttpStatus.OK;
+
     }
     public User findUserById(Long userId) {
         Optional<User> userFromDb = userRepository.findById(userId);
@@ -78,26 +94,28 @@ public class UserService implements UserDetailsService {
         return false;
     }
 
-    public Set<Device> getDeviceSetFromUser(String username){
+    public ResponseEntity<Set<Device>> getDeviceSetFromUser(String username,
+                                                            Principal principal){
+        HttpStatus status = HttpStatus.OK;
         User user = userRepository.findByUsername(username);
-        return user.getDevices();
-    }
-    public void addDeviceToUser(String username, Device device) throws NotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new NotFoundException("User not found");
+        if (user == null || !user.getUsername().equals(principal.getName())){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Set<Device> devices = user.getDevices();
-        devices.add(device);
+        try {
+            Set<Device> devices = user.getDevices();
+            return new ResponseEntity<>(devices, status);
+        } catch (Exception e) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+        return new ResponseEntity<>(status);
 
-        user.setDevices(devices);
-        userRepository.save(user);
+
     }
 
-    public HttpStatus deleteDeviceFromDeviceList(Device device, String username) {
+    public HttpStatus deleteDevice(Device device, String username, Principal principal) {
         User user = userRepository.findByUsername(username);
-        if (user == null) {
+        if (user == null || !user.getUsername().equals(principal.getName())) {
             return HttpStatus.NOT_FOUND;
         }
 
@@ -107,11 +125,15 @@ public class UserService implements UserDetailsService {
         }
 
         if (!devices.contains(device)) {
-            return HttpStatus.OK;
+            return HttpStatus.NOT_FOUND;
         }
 
-        devices.remove(device);
-        userRepository.save(user);
+        try {
+            devices.remove(device);
+            userRepository.save(user);
+        } catch (Exception e){
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
 
         return HttpStatus.OK;
     }

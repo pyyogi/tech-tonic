@@ -22,6 +22,7 @@ public class DeviceService {
         return deviceRepository.findById(id).orElse(null);
     }
 
+
     public HttpStatus save(Device device) {
         try {
             deviceRepository.save(device);

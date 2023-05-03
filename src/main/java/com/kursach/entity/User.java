@@ -1,5 +1,6 @@
 package com.kursach.entity;
 
+import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Set;
 
+@ToString
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
