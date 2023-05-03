@@ -24,11 +24,7 @@ public class GuestController {
     // Get all devices
     @GetMapping(path="/devices")
     public ResponseEntity<List<Device>> getAllDevices() {
-        List<Device> devices = deviceService.getAll();
-        if (devices == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(devices, HttpStatus.OK);
+        return deviceService.getAll();
     }
 
     // Get device by id

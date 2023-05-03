@@ -1,6 +1,7 @@
 package com.kursach.service;
 
 import com.kursach.dto.ItemQuantityDto;
+import com.kursach.dto.OrderDto;
 import com.kursach.entity.Device;
 import com.kursach.entity.Order;
 import com.kursach.entity.OrderItem;
@@ -9,6 +10,7 @@ import com.kursach.repository.DeviceRepository;
 import com.kursach.repository.OrderItemRepository;
 import com.kursach.repository.OrderRepository;
 import com.kursach.repository.UserRepository;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +47,16 @@ public class OrderService {
     }
 
     @Transactional
+    public ResponseEntity<Optional<Order>> getOrderById(Long orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent()) {
+            return new ResponseEntity<>(order, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    }
+
+    @Transactional
     public ResponseEntity<Optional<List<Order>>> getOrders(String username, Principal principal) {
         User user = userRepository.findByUsername(username);
         Optional<List<Order>> orders = orderRepository.findByUser(user);
@@ -52,6 +64,27 @@ public class OrderService {
             return new ResponseEntity<>(orders, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    }
+
+    @Transactional
+    public ResponseEntity<List<OrderDto>> allOrders() {
+        List<OrderDto> orderDtos = new ArrayList<>();
+        HttpStatus status = HttpStatus.OK;
+        try {
+            List<Order> orders = orderRepository.findAll();
+            for (Order order :
+                    orders) {
+                orderDtos.add(new OrderDto(order.getId(),
+                        order.getUser().getId(),
+                        order.getUser().getUsername(),
+                        order.getSumPrice()));
+            }
+            return new ResponseEntity<>(orderDtos, status);
+        } catch (Exception e) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return new ResponseEntity<>(status);
 
     }
 
@@ -107,7 +140,19 @@ public class OrderService {
         return sum;
     }
 
+    public boolean deleteOrdersByUser(User user){
+        Optional<List<Order>> optionalOrders = orderRepository.findByUser(user);
+        if (!optionalOrders.isPresent()){
+            return false;
+        }
+        List<Order> orders = optionalOrders.get();
 
+        for (Order order:
+            orders) {
+            orderRepository.delete(order);
+        }
+        return true;
+    }
 }
 
 
