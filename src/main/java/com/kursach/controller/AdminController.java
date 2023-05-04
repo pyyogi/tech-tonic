@@ -4,7 +4,6 @@ import com.kursach.dto.OrderDto;
 import com.kursach.dto.UserDto;
 import com.kursach.entity.Device;
 import com.kursach.entity.Order;
-import com.kursach.entity.User;
 import com.kursach.repository.DeviceRepository;
 import com.kursach.service.DeviceService;
 import com.kursach.service.OrderService;
@@ -17,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,8 +31,6 @@ public class AdminController {
 
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private DeviceRepository deviceRepository;
 
     @GetMapping("/orders")
     public ResponseEntity<List<OrderDto>> getOrders() {
@@ -64,14 +60,7 @@ public class AdminController {
 
     @PostMapping("/devices")
     public ResponseEntity<HttpStatus> createDevice(@RequestBody Device device) {
-//        return deviceService.save(device);
-        try {
-            deviceRepository.save(device);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
-        }
+        return deviceService.save(device);
     }
 
     @PostMapping("/users/{id}")

@@ -36,25 +36,4 @@ public class Order {
         this.orderItems = new ArrayList<>();
     }
 
-
-    //    @NotBlank(message = "Пожалуйста заполните поле")
-//    private String address;
-//    @NotBlank(message = "Пожалуйста заполните поле")
-//    @Column(name = "first_name")
-//    private String firstName;
-//    @NotBlank(message = "Пожалуйста заполните поле")
-//    @Column(name = "last_name")
-//    private String lastName;
-//    @NotBlank(message = "Пожалуйста заполните поле")
-//    @Column(name = "city")
-//    private String city;
-//    @NotBlank(message = "Пожалуйста заполните поле")
-//    @Column(name = "email")
-//    private String email;
-//    @NotBlank(message = "Пожалуйста заполните поле")
-//    @Column(name = "phone_number")
-//    private String phoneNumber;
-//    @NotBlank(message = "Пожалуйста заполните поле")
-//    @Column(name = "post_index")
-//    private Integer postIndex;
 }

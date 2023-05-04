@@ -18,9 +18,6 @@ public class GuestController {
     @Autowired
     private DeviceService deviceService;
 
-    @Autowired
-    private DeviceRepository deviceRepository;
-
     // Get all devices
     @GetMapping(path="/devices")
     public ResponseEntity<List<Device>> getAllDevices() {
