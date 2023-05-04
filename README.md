@@ -1,7 +1,7 @@
 
 # TechTonic (Backend)
 Backend часть магазина цифровой техники TechTonic разработана с использованием Spring Boot и Hibernate.
-Актуальная версия frontend части находится по адресу: ... 
+Актуальная версия frontend части находится по адресу: https://github.com/pyyogi/tech-front-new
 ## Использованные технологии
 + Spring (Boot, Data, Security)
 + JPA / Hibernate
@@ -9,6 +9,12 @@ Backend часть магазина цифровой техники TechTonic р
 + Maven
 + Lombok, slf4j
 + Postman
+
+## Getting Started
+
+- Используй команду `mvn clean install` в корневой директории проекта, чтобы собрать проект. 
+- Запусти главный класс `com.kursach.TechTonicApplication`, чтобы запустить приложение.
+
 ## Функционал
 Пользователь без роли может:
 + смотреть главную страницу с товарами
@@ -192,10 +198,7 @@ D --> |Роль: USER| X[Добавление девайса в корзину]
 ```
 
 
-## Getting Started
 
-- Используй команду `mvn clean install` в корневой директории проекта, чтобы собрать проект. 
-- Запусти главный класс `com.kursach.TechTonicApplication`, чтобы запустить приложение.
 
 ## Endpoints
 
