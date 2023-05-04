@@ -48,4 +48,19 @@ public class DeviceService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    public ResponseEntity<HttpStatus> update(Device updatedDevice) {
+        Optional<Device> optionalDevice = deviceRepository.findById(updatedDevice.getId());
+        if (optionalDevice.isPresent()) {
+            Device device = optionalDevice.get();
+            device.setTitle(updatedDevice.getTitle());
+            device.setBrand(updatedDevice.getBrand());
+            device.setPrice(updatedDevice.getPrice());
+            device.setDescription(updatedDevice.getDescription());
+            device.setFilename(updatedDevice.getFilename());
+            deviceRepository.save(device);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

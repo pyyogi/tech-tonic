@@ -41,8 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                         "/signup"
                                 )
                                 .permitAll()
-                                .antMatchers(HttpMethod.GET,
-                                        "/devices",
+                                .antMatchers("/devices",
                                         "/devices/**")
                                 .permitAll()
                                 .anyRequest()

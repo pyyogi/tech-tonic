@@ -45,4 +45,12 @@ public class Device {
     @NotBlank(message = "Please fill in this field.")
     private String filename;
 
+    public Device(String title, int price, String description, String type, String brand, String filename) {
+        this.title = title;
+        this.price = price;
+        this.description = description;
+        this.type = type;
+        this.brand = brand;
+        this.filename = filename;
+    }
 }
